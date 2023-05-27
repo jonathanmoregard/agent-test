@@ -6,19 +6,16 @@ import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Text.IO qualified as TIO
 import Data.Vector qualified as V
-import Effect.Console (ConsoleE)
 import Effect.Console qualified as ConsoleE
-import Effect.LLM (LLMEffect, Prompt (..), Response (..))
 import Effect.LLM qualified as LLME
-import Effectful (Dispatch (..), DispatchOf, Eff, Effect, IOE, MonadIO (liftIO), (:>))
 import Effectful qualified as IOE
-import Effectful.Error.Static (CallStack, Error, prettyCallStack, throwError)
 import Effectful.Error.Static qualified as Error
 import Network.HTTP.Client (newManager)
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 import OpenAI.Client (OpenAIClient)
 import OpenAI.Client qualified as OpenAI
 import OpenAI.Resources (EngineId (EngineId))
+import Effectful.Error.Static (CallStack, prettyCallStack, throwError)
 import System.Environment (getEnv, lookupEnv)
 import Program
 

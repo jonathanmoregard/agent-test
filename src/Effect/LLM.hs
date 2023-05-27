@@ -4,7 +4,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Effect.LLM (Prompt (..), Response (..), LLMEffect, completeText, runLLMEffect) where
+module Effect.LLM (LLMEffect, completeText, runLLMEffect) where
 
 import Control.Exception (IOException)
 import Data.Bifunctor (second)
@@ -29,19 +29,12 @@ import OpenAI.Resources
 import System.Environment (getEnv, lookupEnv)
 import UnliftIO (catch)
 
-newtype Prompt
-  = Prompt Text
-
-newtype Response
-  = Response Text
-  deriving (Eq, Show)
-
 data LLMEffect :: Effectful.Effect where
-  CompleteText :: Prompt -> LLMEffect m Response
+  CompleteText :: Text -> LLMEffect m Text
 
 type instance DispatchOf LLMEffect = 'Dynamic
 
-completeText :: LLMEffect :> es => Prompt -> Eff es Response
+completeText :: LLMEffect :> es => Text -> Eff es Text
 completeText prompt = send $ CompleteText prompt
 
 runLLMEffect ::
@@ -51,7 +44,7 @@ runLLMEffect ::
   Eff (LLMEffect : es) a ->
   Eff es a
 runLLMEffect client engine = interpret $ \_ -> \case
-  CompleteText (Prompt prompt) -> do
+  CompleteText prompt -> do
     result <- adapt $ OpenAI.completeText client engine $ defaultTextCompletionCreate prompt
     case result of
       Left err -> throwError $ "Client error:" <> T.pack (show err)
@@ -59,7 +52,7 @@ runLLMEffect client engine = interpret $ \_ -> \case
         let choices = tcChoices response
         if V.null choices
           then throwError $ T.pack "No choices in response"
-          else pure $ Response $ tccText (V.head choices)
+          else pure $ tccText (V.head choices)
     where
       adapt :: (IOE :> es, Error Text :> es) => IO a -> Eff es a
       adapt m = liftIO m `catch` \(e :: IOException) -> throwError $ T.pack (show e)
