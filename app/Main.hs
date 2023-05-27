@@ -28,7 +28,7 @@ main = do
     (result :: Either (CallStack, Text) ()) <- Error.runError $ do
       client <- case lookup "OpenAiSecret" configKvp of
         Nothing -> throwError $ T.pack "Could not find OPENAI_KEY in app.config."
-        Just apiKey -> pure $ OpenAI.makeOpenAIClient apiKey manager 4
+        Just apiKey -> pure $ OpenAI.makeOpenAIClient apiKey manager 8
       LLME.runLLMEffect client engineId Program.program
     case result of
       Right () -> pure ()

@@ -52,7 +52,7 @@ runLLMEffect client engine = interpret $ \_ -> \case
         let choices = tcChoices response
         if V.null choices
           then throwError $ T.pack "No choices in response"
-          else pure $ tccText (V.head choices)
+          else pure $ T.dropWhile (== '\n') $ tccText (V.head choices)
     where
       adapt :: (IOE :> es, Error Text :> es) => IO a -> Eff es a
       adapt m = liftIO m `catch` \(e :: IOException) -> throwError $ T.pack (show e)

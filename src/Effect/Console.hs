@@ -14,6 +14,7 @@ import Data.Text.IO qualified as TIO
 import Effectful (Dispatch (..), DispatchOf, Eff, Effect, IOE, MonadIO (liftIO), (:>))
 import Effectful.Dispatch.Dynamic (interpret, send)
 import Effectful.Error.Static (Error, throwError)
+import System.IO (hSetEncoding, stdout, utf8)
 
 data ConsoleE :: Effectful.Effect where
   Print :: Show a => a -> ConsoleE m ()
@@ -28,4 +29,6 @@ runConsoleE ::
   Eff (ConsoleE : es) a ->
   Eff es a
 runConsoleE = interpret $ \_ -> \case
-  Print a -> liftIO $ Prelude.print a
+  Print a -> liftIO $ do
+    hSetEncoding stdout utf8
+    Prelude.print a

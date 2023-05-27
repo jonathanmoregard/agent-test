@@ -25,7 +25,8 @@ library
                       vector
     hs-source-dirs:   src
     default-language: Haskell2010
-    default-extensions: GHC2021, ImportQualifiedPost, LambdaCase, OverloadedStrings
+    default-extensions: GHC2021, DerivingStrategies, DisambiguateRecordFields, DuplicateRecordFields, ExplicitNamespaces, ImportQualifiedPost, LambdaCase, OverloadedRecordDot, OverloadedStrings
+
 
 executable agent-test
     main-is:          Main.hs
@@ -42,7 +43,7 @@ executable agent-test
         vector
     hs-source-dirs:   app
     default-language: Haskell2010
-    default-extensions: GHC2021, ImportQualifiedPost, LambdaCase, OverloadedStrings
+    default-extensions: GHC2021, DerivingStrategies, DisambiguateRecordFields, DuplicateRecordFields, ExplicitNamespaces, ImportQualifiedPost, LambdaCase, OverloadedRecordDot, OverloadedStrings
 
 test-suite agent-test-test
     default-language: Haskell2010
@@ -50,4 +51,4 @@ test-suite agent-test-test
     hs-source-dirs:   test
     main-is:          MyLibTest.hs
     build-depends:    base ^>=4.16.4.0
-    default-extensions: GHC2021, ImportQualifiedPost, LambdaCase, OverloadedStrings
+    default-extensions: GHC2021, DerivingStrategies, DisambiguateRecordFields, DuplicateRecordFields, ExplicitNamespaces, ImportQualifiedPost, LambdaCase, OverloadedRecordDot, OverloadedStrings
