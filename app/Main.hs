@@ -20,6 +20,7 @@ import OpenAI.Client (OpenAIClient)
 import OpenAI.Client qualified as OpenAI
 import OpenAI.Resources (EngineId (EngineId))
 import System.Environment (getEnv, lookupEnv)
+import Program
 
 main :: IO ()
 main = do
@@ -31,12 +32,7 @@ main = do
       client <- case lookup "OpenAiSecret" configKvp of
         Nothing -> throwError $ T.pack "Could not find OPENAI_KEY in app.config."
         Just apiKey -> pure $ OpenAI.makeOpenAIClient apiKey manager 4
-      LLME.runLLMEffect client engineId program
+      LLME.runLLMEffect client engineId Program.program
     case result of
       Right () -> pure ()
       Left (cs, err) -> ConsoleE.print $ "Error: " <> show err <> ", callstack: " <> prettyCallStack cs
-
-program :: (ConsoleE :> es, LLMEffect :> es) => Eff es ()
-program = do
-  res <- LLME.completeText (Prompt "Translate the following English text to French: 'Hello, how are you?'")
-  ConsoleE.print res
