@@ -34,7 +34,7 @@ main = do
       LLME.runLLMEffect client engineId program
     case result of
       Right () -> pure ()
-      Left (cs, err) -> liftIO $ print $ "Error: " <> show err <> ", callstack: " <> prettyCallStack cs
+      Left (cs, err) -> ConsoleE.print $ "Error: " <> show err <> ", callstack: " <> prettyCallStack cs
 
 program :: (ConsoleE :> es, LLMEffect :> es) => Eff es ()
 program = do
