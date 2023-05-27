@@ -15,7 +15,7 @@ import Data.Text.IO qualified as TIO
 import Data.Vector qualified as V
 import Effectful (Dispatch (..), DispatchOf, Eff, Effect, IOE, MonadIO (liftIO), (:>))
 import Effectful.Dispatch.Dynamic (interpret, send)
-import Effectful.Error.Dynamic (Error, throwError)
+import Effectful.Error.Static (Error, throwError)
 import Network.HTTP.Client qualified as HTTPClient
 import Network.HTTP.Client.TLS qualified as HTTPClient
 import OpenAI.Client (OpenAIClient)

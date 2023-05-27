@@ -12,6 +12,7 @@ extra-source-files: CHANGELOG.md
 
 library
     exposed-modules:  Effect.LLM
+                      Effect.Console
     build-depends:    base ^>=4.16.4.0,
                       effectful,
                       openai-hs,
