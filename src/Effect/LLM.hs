@@ -18,7 +18,7 @@ import Effectful.Dispatch.Dynamic (interpret, send)
 import Effectful.Error.Static (Error, throwError)
 import Network.HTTP.Client qualified as HTTPClient
 import Network.HTTP.Client.TLS qualified as HTTPClient
-import OpenAI.Client (OpenAIClient)
+import OpenAI.Client (OpenAIClient, TextCompletionCreate (tccrMaxTokens))
 import OpenAI.Client qualified as OpenAI
 import OpenAI.Resources
   ( EngineId,
@@ -45,7 +45,7 @@ runLLMEffect ::
   Eff es a
 runLLMEffect client engine = interpret $ \_ -> \case
   CompleteText prompt -> do
-    result <- adapt $ OpenAI.completeText client engine $ defaultTextCompletionCreate prompt
+    result <- adapt $ OpenAI.completeText client engine $ (defaultTextCompletionCreate prompt) {tccrMaxTokens = Just 1000}
     case result of
       Left err -> throwError $ "Client error:" <> T.pack (show err)
       Right response -> do
