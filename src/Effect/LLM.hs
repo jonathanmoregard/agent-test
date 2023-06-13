@@ -4,11 +4,12 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Effect.LLM (LLMEffect, completeText, runLLMEffect) where
+module Effect.LLM (LLMEffect, completeText, generateEmbedding, runLLMEffect) where
 
 import Control.Exception (IOException)
 import Data.Bifunctor (second)
 import Data.Either (Either, either)
+import Data.EmbeddingVector (EmbeddingVector, embeddingVector)
 import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Text.IO qualified as TIO
@@ -18,10 +19,11 @@ import Effectful.Dispatch.Dynamic (interpret, send)
 import Effectful.Error.Static (Error, throwError)
 import Network.HTTP.Client qualified as HTTPClient
 import Network.HTTP.Client.TLS qualified as HTTPClient
-import OpenAI.Client (OpenAIClient, TextCompletionCreate (tccrMaxTokens))
+import OpenAI.Client (EmbeddingCreate (..), OpenAIClient, TextCompletionCreate (tccrMaxTokens))
 import OpenAI.Client qualified as OpenAI
 import OpenAI.Resources
-  ( EngineId,
+  ( Embedding (..),
+    EngineId,
     TextCompletion (tcChoices),
     TextCompletionChoice (tccText),
     defaultTextCompletionCreate,
@@ -31,11 +33,15 @@ import UnliftIO (catch)
 
 data LLMEffect :: Effectful.Effect where
   CompleteText :: Text -> LLMEffect m Text
+  GenerateEmbedding :: Text -> LLMEffect m EmbeddingVector
 
 type instance DispatchOf LLMEffect = 'Dynamic
 
 completeText :: LLMEffect :> es => Text -> Eff es Text
 completeText prompt = send $ CompleteText prompt
+
+generateEmbedding :: LLMEffect :> es => Text -> Eff es EmbeddingVector
+generateEmbedding input = send $ GenerateEmbedding input
 
 runLLMEffect ::
   (IOE :> es, Error Text :> es) =>
@@ -53,6 +59,12 @@ runLLMEffect client engine = interpret $ \_ -> \case
         if V.null choices
           then throwError $ T.pack "No choices in response"
           else pure $ T.dropWhile (== '\n') $ tccText (V.head choices)
-    where
-      adapt :: (IOE :> es, Error Text :> es) => IO a -> Eff es a
-      adapt m = liftIO m `catch` \(e :: IOException) -> throwError $ T.pack (show e)
+  GenerateEmbedding input -> do
+    let embeddingCreate = EmbeddingCreate input
+    result <- adapt $ OpenAI.createEmbedding client engine embeddingCreate
+    case result of
+      Left err -> throwError $ "Client error:" <> T.pack (show err)
+      Right response -> pure . embeddingVector . eEmbedding . V.head . OpenAI.olData $ response
+  where
+    adapt :: (IOE :> es, Error Text :> es) => IO a -> Eff es a
+    adapt m = liftIO m `catch` \(e :: IOException) -> throwError $ T.pack (show e)
