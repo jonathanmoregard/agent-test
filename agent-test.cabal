@@ -1,8 +1,9 @@
 cabal-version:      3.0
-
 name:               agent-test
 version:            0.1.0.0
-synopsis:           An attempt at using streamly + LLM to simulate agentic behavior
+synopsis:
+  An attempt at using streamly + LLM to simulate agentic behavior
+
 license:            MIT
 license-file:       LICENSE
 author:             Jonathan Moregård
@@ -11,44 +12,78 @@ category:           Simulation
 extra-source-files: CHANGELOG.md
 
 library
-    exposed-modules:  Effect.LLM
-                      Effect.Console
-                      Program
-    build-depends:    base ^>=4.16.4.0,
-                      effectful,
-                      openai-hs,
-                      openai-servant,
-                      http-client,
-                      http-client-tls,
-                      text,
-                      unliftio,
-                      vector
-    hs-source-dirs:   src
-    default-language: Haskell2010
-    default-extensions: GHC2021, DerivingStrategies, DisambiguateRecordFields, DuplicateRecordFields, ExplicitNamespaces, ImportQualifiedPost, LambdaCase, OverloadedRecordDot, OverloadedStrings
+  exposed-modules:
+    Effect.Console
+    Effect.LLM
+    Program
 
+  build-depends:
+    , base             ^>=4.16.4.0
+    , effectful
+    , finite-typelits
+    , http-client
+    , http-client-tls
+    , openai-hs
+    , openai-servant
+    , text
+    , time
+    , unliftio
+    , vector
+
+  hs-source-dirs:     src
+  default-language:   Haskell2010
+  default-extensions:
+    DerivingStrategies
+    DisambiguateRecordFields
+    DuplicateRecordFields
+    ExplicitNamespaces
+    ImportQualifiedPost
+    LambdaCase
+    OverloadedRecordDot
+    OverloadedStrings
+    GHC2021
 
 executable agent-test
-    main-is:          Main.hs
-    build-depends:
-        base ^>=4.16.4.0,
-        effectful,
-        agent-test,
-        openai-hs,
-        openai-servant,
-        http-client,
-        http-client-tls,
-        text,
-        unliftio,
-        vector
-    hs-source-dirs:   app
-    default-language: Haskell2010
-    default-extensions: GHC2021, DerivingStrategies, DisambiguateRecordFields, DuplicateRecordFields, ExplicitNamespaces, ImportQualifiedPost, LambdaCase, OverloadedRecordDot, OverloadedStrings
+  main-is:            Main.hs
+  build-depends:
+    , agent-test
+    , base             ^>=4.16.4.0
+    , effectful
+    , http-client
+    , http-client-tls
+    , openai-hs
+    , openai-servant
+    , text
+    , time
+    , unliftio
+    , vector
+
+  hs-source-dirs:     app
+  default-language:   Haskell2010
+  default-extensions:
+    DerivingStrategies
+    DisambiguateRecordFields
+    DuplicateRecordFields
+    ExplicitNamespaces
+    ImportQualifiedPost
+    LambdaCase
+    OverloadedRecordDot
+    OverloadedStrings
+    GHC2021
 
 test-suite agent-test-test
-    default-language: Haskell2010
-    type:             exitcode-stdio-1.0
-    hs-source-dirs:   test
-    main-is:          MyLibTest.hs
-    build-depends:    base ^>=4.16.4.0
-    default-extensions: GHC2021, DerivingStrategies, DisambiguateRecordFields, DuplicateRecordFields, ExplicitNamespaces, ImportQualifiedPost, LambdaCase, OverloadedRecordDot, OverloadedStrings
+  default-language:   Haskell2010
+  type:               exitcode-stdio-1.0
+  hs-source-dirs:     test
+  main-is:            MyLibTest.hs
+  build-depends:      base ^>=4.16.4.0
+  default-extensions:
+    DerivingStrategies
+    DisambiguateRecordFields
+    DuplicateRecordFields
+    ExplicitNamespaces
+    ImportQualifiedPost
+    LambdaCase
+    OverloadedRecordDot
+    OverloadedStrings
+    GHC2021

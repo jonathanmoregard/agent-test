@@ -16,17 +16,17 @@ import Effectful.Dispatch.Dynamic (interpret, send)
 import Effectful.Error.Static (Error, throwError)
 import System.IO (hSetEncoding, stdout, utf8)
 
-data ConsoleE :: Effectful.Effect where
-  Print :: Show a => a -> ConsoleE m ()
+data ConsoleEffect :: Effectful.Effect where
+  Print :: Show a => a -> ConsoleEffect m ()
 
-type instance DispatchOf ConsoleE = 'Dynamic
+type instance DispatchOf ConsoleEffect = 'Dynamic
 
-print :: (ConsoleE :> es, Show a) => a -> Eff es ()
+print :: (ConsoleEffect :> es, Show a) => a -> Eff es ()
 print prompt = send $ Print prompt
 
 runConsoleE ::
   (IOE :> es) =>
-  Eff (ConsoleE : es) a ->
+  Eff (ConsoleEffect : es) a ->
   Eff es a
 runConsoleE = interpret $ \_ -> \case
   Print a -> liftIO $ do
