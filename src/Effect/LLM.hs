@@ -19,14 +19,12 @@ import Effectful.Dispatch.Dynamic (interpret, send)
 import Effectful.Error.Static (Error, throwError)
 import Network.HTTP.Client qualified as HTTPClient
 import Network.HTTP.Client.TLS qualified as HTTPClient
-import OpenAI.Client (EmbeddingCreate (..), OpenAIClient, TextCompletionCreate (tccrMaxTokens))
+import OpenAI.Client (CompletionCreate (ccrMaxTokens), CompletionResponse, EmbeddingCreate (..), OpenAIClient, TextCompletionCreate (tccrMaxTokens))
 import OpenAI.Client qualified as OpenAI
 import OpenAI.Resources
-  ( Embedding (..),
-    EngineId,
+  ( EngineId,
     TextCompletion (tcChoices),
     TextCompletionChoice (tccText),
-    defaultTextCompletionCreate,
   )
 import System.Environment (getEnv, lookupEnv)
 import UnliftIO (catch)
@@ -46,25 +44,24 @@ generateEmbedding input = send $ GenerateEmbedding input
 runLLMEffect ::
   (IOE :> es, Error Text :> es) =>
   OpenAIClient ->
-  EngineId ->
   Eff (LLMEffect : es) a ->
   Eff es a
-runLLMEffect client engine = interpret $ \_ -> \case
+runLLMEffect client = interpret $ \_ -> \case
   CompleteText prompt -> do
-    result <- adapt $ OpenAI.completeText client engine $ (defaultTextCompletionCreate prompt) {tccrMaxTokens = Just 1000}
+    result <- adapt $ OpenAI.completeText client (OpenAI.defaultCompletionCreate (OpenAI.ModelId "text-davinci-003") prompt) {ccrMaxTokens = Just 1000}
     case result of
       Left err -> throwError $ "Client error:" <> T.pack (show err)
       Right response -> do
-        let choices = tcChoices response
-        if V.null choices
+        let choices = OpenAI.crChoices response
+        if null choices
           then throwError $ T.pack "No choices in response"
-          else pure $ T.dropWhile (== '\n') $ tccText (V.head choices)
+          else pure $ T.dropWhile (== '\n') $ OpenAI.cchText (head choices)
   GenerateEmbedding input -> do
-    let embeddingCreate = EmbeddingCreate input
-    result <- adapt $ OpenAI.createEmbedding client engine embeddingCreate
+    let embeddingCreate = EmbeddingCreate (OpenAI.ModelId "text-embedding-ada-002") input Nothing
+    result <- adapt $ OpenAI.createEmbedding client embeddingCreate
     case result of
       Left err -> throwError $ "Client error:" <> T.pack (show err)
-      Right response -> pure . embeddingVector . eEmbedding . V.head . OpenAI.olData $ response
+      Right response -> pure . embeddingVector . OpenAI.embdEmbedding . head . OpenAI.embrData $ response
   where
     adapt :: (IOE :> es, Error Text :> es) => IO a -> Eff es a
     adapt m = liftIO m `catch` \(e :: IOException) -> throwError $ T.pack (show e)
