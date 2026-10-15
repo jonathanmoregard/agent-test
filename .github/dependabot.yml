@@ -1,0 +1,14 @@
+version: 2
+multi-ecosystem-groups:
+  probe-all:
+    schedule:
+      interval: "weekly"
+updates:
+  - package-ecosystem: "cargo"
+    directory: "/dependabot-probe"
+    patterns: ["*"]
+    multi-ecosystem-group: "probe-all"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    patterns: ["*"]
+    multi-ecosystem-group: "probe-all"

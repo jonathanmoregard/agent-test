@@ -1,0 +1,8 @@
+name: probe
+on: workflow_dispatch
+permissions: {}
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.1.0
