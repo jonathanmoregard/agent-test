@@ -7,5 +7,5 @@ publish = false
 # Probe: does a multi-ecosystem group bundle semver-major updates?
 # serde has only minor/patch updates available; thiserror has a major (2.x).
 [dependencies]
-serde = "=1.0.100"
-thiserror = "=1.0.0"
+serde = "=1.0.229"
+thiserror = "=2.0.21"
