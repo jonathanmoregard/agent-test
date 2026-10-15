@@ -1,14 +1,24 @@
 version: 2
 multi-ecosystem-groups:
-  probe-all:
+  probe-nonmajor:
     schedule:
       interval: "weekly"
 updates:
   - package-ecosystem: "cargo"
     directory: "/dependabot-probe"
+    schedule:
+      interval: "weekly"
     patterns: ["*"]
-    multi-ecosystem-group: "probe-all"
+    multi-ecosystem-group: "probe-nonmajor"
+    groups:
+      cargo-nonmajor:
+        update-types: ["minor", "patch"]
   - package-ecosystem: "github-actions"
     directory: "/"
+    schedule:
+      interval: "weekly"
     patterns: ["*"]
-    multi-ecosystem-group: "probe-all"
+    multi-ecosystem-group: "probe-nonmajor"
+    groups:
+      actions-nonmajor:
+        update-types: ["minor", "patch"]
